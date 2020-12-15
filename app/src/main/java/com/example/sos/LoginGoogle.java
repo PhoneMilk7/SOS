@@ -32,7 +32,7 @@ public class LoginGoogle extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login_google);
 
-        //Inicialiso el boton
+        //Inicialiso el boto
         Button signInButton = findViewById(R.id.button);
 
 
@@ -83,8 +83,8 @@ public class LoginGoogle extends AppCompatActivity {
 
     @Override
     protected void onStart() {
-        // Check for existing Google Sign In account, if the user is already signed in
-        // the GoogleSignInAccount will be non-null.
+        // Compruebe la cuenta de inicio de sesión de Google existente, si el usuario ya ha iniciado sesión
+        // GoogleSignInAccount no será nulo..
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
         if(account != null) {
             startActivity(new Intent(LoginGoogle.this, Activity2.class));
