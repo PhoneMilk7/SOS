@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Emergencia">
+
+    <Button
+        android:id="@+id/buttonPropia"
+        android:layout_width="200dp"
+        android:layout_height="98dp"
+        android:layout_marginTop="74dp"
+        android:onClick="propia"
+        android:text="Emergencia propia"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/buttonTerceros"
+        android:layout_width="0dp"
+        android:layout_height="100dp"
+        android:layout_marginTop="77dp"
+        android:onClick="terceros"
+        android:text="Emergencia de terceros"
+        app:layout_constraintEnd_toEndOf="@+id/buttonPropia"
+        app:layout_constraintStart_toStartOf="@+id/buttonPropia"
+        app:layout_constraintTop_toBottomOf="@+id/buttonPropia" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="167dp"
+        android:layout_marginLeft="167dp"
+        android:layout_marginTop="234dp"
+        android:layout_marginEnd="185dp"
+        android:layout_marginRight="185dp"
+        android:text="TextView"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/buttonTerceros" />
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,24 @@
+<resources>
+    <string name="app_name">SOS</string>
+    <string name="txt_nombre">Nombre</string>
+    <string name="txt_apellidoPaterno">Apellido Paterno</string>
+    <string name="txt_apellidoMaterno">Apellido Materno</string>
+    <string name="txt_edad">Edad</string>
+    <string name="rdb_mujer">Mujer</string>
+    <string name="rdb_hombre">Hombre</string>
+    <string name="txt_telefono">Teléfono</string>
+    <string name="Titulo_personales">Datos personales</string>
+
+    <string name="text_inicio">Google Sign On</string>
+    <string name="boton_inicio">Google Sign On</string>
+    <string name="title_activity_maps">Map</string>
+    <string name="boton_mapa">Mapa Google</string>
+    <string name="title_activity_opcionea">opciones</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_title">Android Studio</string>
+    <string name="nav_header_subtitle">android.studio@android.com</string>
+    <string name="nav_header_desc">Navigation header</string>
+    <string name="action_settings">Settings</string>
+
+</resources>
