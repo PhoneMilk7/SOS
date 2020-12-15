@@ -27,17 +27,18 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
-        <activity android:name=".LoginGoogle">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter></activity>
+        <activity android:name=".LoginGoogle"></activity>
         <activity android:name=".emergencia_terceros" />
         <activity android:name=".Emergencia" />
         <activity android:name=".Padecimientos" />
         <activity android:name=".DatosPersonales" />
-        <activity android:name=".Activity2"></activity>
+        <activity android:name=".Activity2">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>

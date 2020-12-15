@@ -1,8 +1,5 @@
 package com.example.sos;
 
-import androidx.appcompat.app.AppCompatActivity;
-
-import android.os.Bundle;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -32,9 +29,8 @@ public class LoginGoogle extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login_google);
 
-        //Inicialiso el boto
+        //Inicialiso el boton
         Button signInButton = findViewById(R.id.button);
-
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
@@ -83,8 +79,8 @@ public class LoginGoogle extends AppCompatActivity {
 
     @Override
     protected void onStart() {
-        // Compruebe la cuenta de inicio de sesión de Google existente, si el usuario ya ha iniciado sesión
-        // GoogleSignInAccount no será nulo..
+        // Check for existing Google Sign In account, if the user is already signed in
+        // the GoogleSignInAccount will be non-null.
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
         if(account != null) {
             startActivity(new Intent(LoginGoogle.this, Activity2.class));
