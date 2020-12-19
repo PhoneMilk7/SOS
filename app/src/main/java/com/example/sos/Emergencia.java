@@ -2,7 +2,7 @@ package com.example.sos;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
+
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -37,7 +37,7 @@ import java.net.URL;
 import java.net.URLEncoder;
 
 public class Emergencia extends AppCompatActivity {
-    static String token = "CositasSOS", sesion = "1", imei , estado, longitud, latitud, tipo,IMEICode="5656";
+    static String token = "CositasSOS", sesion = "1", imei , estado, longitud, latitud, tipo,IMEICode="2147483647";
     static double Latitude, Longitude;
     TextView textView;
     Button btnpropia;
@@ -48,8 +48,9 @@ public class Emergencia extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_emergencia);
         Button btnpropia = this.findViewById(R.id.buttonPropia);
-          Button btntercero = this.findViewById(R.id.buttonTerceros);
+        Button btntercero = this.findViewById(R.id.buttonTerceros);
 
+        //Llama a la funcion para checar todos los permisos
         CheckAllPermission();
         textView = this.findViewById(R.id.textView);
         textView.setText(String.format("%s GPS (%.5f, %.5f)", IMEICode, Latitude, Longitude));
@@ -79,6 +80,8 @@ public class Emergencia extends AppCompatActivity {
         tipo = "2";               //El evento es de tipo Emergencia propia
         new Emergencia.guardarDB(Emergencia.this).execute(token, sesion,imei,estado,longitud,latitud,tipo);
     }
+
+    //Manda a guardar los datos de la emegencia
     public static class guardarDB extends AsyncTask<String, Void, String> {
 
         private WeakReference<Context> context;
@@ -91,7 +94,7 @@ public class Emergencia extends AppCompatActivity {
         }
 
         protected String doInBackground(String... params) {
-            String registrar_url = "http://alprasystems.com/emprende/sesion.php"; //Ubicacion del archivo sesion en el HOST
+            String registrar_url = "http://www.alprasystems.com/emprende/sesion.php"; //Ubicacion del archivo sesion en el HOST
             String resultado;
 
             try {
@@ -110,6 +113,7 @@ public class Emergencia extends AppCompatActivity {
                 latitud = params[5];
                 tipo = params[6];
 
+                //Crea la variable data con todos los datos en formato URLEncode
                 String data = URLEncoder.encode("token", "UTF_8") + "=" + URLEncoder.encode(token, "UTF_8") + "&" +
                         URLEncoder.encode("sesion", "UTF_8") + "=" + URLEncoder.encode(sesion, "UTF_8") + "&" +
                         URLEncoder.encode("imei", "UTF_8") + "=" + URLEncoder.encode(imei, "UTF_8") + "&" +
@@ -142,7 +146,7 @@ public class Emergencia extends AppCompatActivity {
                 resultado = "Ha ocurrido un error ";
             } catch (IOException e) {
                 Log.d("MIAPP", "Error ");
-                resultado = "Ha ocurrido un error" + e.getMessage();
+                resultado = "Ha ocurrido un error " + e.getMessage();
             }
             return resultado;
         }
@@ -152,8 +156,7 @@ public class Emergencia extends AppCompatActivity {
         }
     }
 
-    private void CheckAllPermission()
-    {
+    private void CheckAllPermission() {
         try {
             String[] permissions = getPackageManager().getPackageInfo(getBaseContext().getPackageName(),
                     PackageManager.GET_PERMISSIONS).requestedPermissions;
@@ -162,8 +165,7 @@ public class Emergencia extends AppCompatActivity {
         } catch (PackageManager.NameNotFoundException e) {}
     }
 
-    private void CheckPermission(String PermissionToCheck)
-    {
+    private void CheckPermission(String PermissionToCheck) {
         if (android.os.Build.VERSION.SDK_INT >= 23)
         {
             boolean ResultCheck = false;
@@ -220,7 +222,6 @@ public class Emergencia extends AppCompatActivity {
         public void onLocationChanged(Location location) {
             Latitude = location.getLatitude();
             Longitude = location.getLongitude();
-            //IMEICode = getDeviceIMEI();
             textView.setText(String.format("%s GPS (%.5f, %.5f)", Latitude, Longitude));
         }
 
@@ -230,4 +231,7 @@ public class Emergencia extends AppCompatActivity {
 
         }
     }
+
+    public void localizar(){}
+
 }
