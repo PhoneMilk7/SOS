@@ -25,7 +25,6 @@ public class Menu extends AppCompatActivity {
 
     GoogleSignInClient mGoogleSignInClient;
     Button sign_out;
-    Button btn_mapa;
     TextView nameTV;
     TextView emailTV;
     TextView idTV;

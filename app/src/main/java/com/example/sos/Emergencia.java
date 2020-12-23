@@ -2,13 +2,20 @@ package com.example.sos;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Service;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -35,33 +42,74 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.text.DateFormat;
+import java.util.ArrayList;
 
-public class Emergencia extends AppCompatActivity {
+public class Emergencia extends AppCompatActivity implements LocationListener {
+    private static final int REQUEST_LOCATION = 1;
     static String token = "CositasSOS", sesion = "1", imei , estado, longitud, latitud, tipo,IMEICode="2147483647";
     static double Latitude, Longitude;
     TextView textView;
     Button btnpropia;
     Button btntercero;
+    Button btnGetLocation;
+    String latitude, longitude;
+
+    //Parte de permisos de ubicacion
+    final String TAG = "GPS";
+    private final static int ALL_PERMISSIONS_RESULT = 101;
+    private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 10;
+    private static final long MIN_TIME_BW_UPDATES = 1000 * 60 * 1;
+
+    TextView tvLatitude, tvLongitude;
+    LocationManager locationManager;
+    Location loc;
+    ArrayList<String> permissions = new ArrayList<>();
+    ArrayList<String> permissionsToRequest;
+    ArrayList<String> permissionsRejected = new ArrayList<>();
+    boolean isGPS = false;
+    boolean isNetwork = false;
+    boolean canGetLocation = true;
+    //---------------------------
+
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_emergencia);
+        ActivityCompat.requestPermissions( this, new String[] {Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_LOCATION);
         Button btnpropia = this.findViewById(R.id.buttonPropia);
         Button btntercero = this.findViewById(R.id.buttonTerceros);
+        textView = (TextView) findViewById(R.id.textView);
 
-        //Llama a la funcion para checar todos los permisos
-        CheckAllPermission();
-        textView = this.findViewById(R.id.textView);
-        textView.setText(String.format("%s GPS (%.5f, %.5f)", IMEICode, Latitude, Longitude));
-        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        LocationListener locationListener = new MyLocationListener();
+        //Pedir la localizacion
+        locationManager = (LocationManager) getSystemService(Service.LOCATION_SERVICE);
+        isGPS = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        isNetwork = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
 
-        if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-                checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            return;
+        permissions.add(Manifest.permission.ACCESS_FINE_LOCATION);
+        permissions.add(Manifest.permission.ACCESS_COARSE_LOCATION);
+        permissionsToRequest = findUnAskedPermissions(permissions);
+
+        if (!isGPS && !isNetwork) {
+            Log.d(TAG, "Connection off");
+            showSettingsAlert();
+            getLastLocation();
+        } else {
+            Log.d(TAG, "Connection on");
+            // check permissions
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                if (permissionsToRequest.size() > 0) {
+                    requestPermissions(permissionsToRequest.toArray(new String[permissionsToRequest.size()]),
+                            ALL_PERMISSIONS_RESULT);
+                    Log.d(TAG, "Permission requests");
+                    canGetLocation = false;
+                }
+            }
+            // get location
+            getLocation();
         }
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0, locationListener);
+
     }
 
     public void propia(View view){
@@ -155,83 +203,181 @@ public class Emergencia extends AppCompatActivity {
             Toast.makeText(context.get(), resultado, Toast.LENGTH_LONG).show();
         }
     }
+    //Autorizacion para usar la ubicacion
+    public void onLocationChanged(Location location) {
+        Log.d(TAG, "onLocationChanged");
+        updateUI(location);
+    }
 
-    private void CheckAllPermission() {
+    public void onStatusChanged(String s, int i, Bundle bundle) {}
+
+    public void onProviderEnabled(String s) {
+        getLocation();
+    }
+
+    public void onProviderDisabled(String s) {
+        if (locationManager != null) {
+            locationManager.removeUpdates((LocationListener) this);
+        }
+    }
+
+    private void getLocation() {
         try {
-            String[] permissions = getPackageManager().getPackageInfo(getBaseContext().getPackageName(),
-                    PackageManager.GET_PERMISSIONS).requestedPermissions;
-            for(int i = 0; i < permissions.length; i++)
-                CheckPermission(permissions[i]);
-        } catch (PackageManager.NameNotFoundException e) {}
+            if (canGetLocation) {
+                Log.d(TAG, "Can get location");
+                if (isGPS) {
+                    // from GPS
+                    Log.d(TAG, "GPS on");
+                    locationManager.requestLocationUpdates(
+                            LocationManager.GPS_PROVIDER,
+                            MIN_TIME_BW_UPDATES,
+                            MIN_DISTANCE_CHANGE_FOR_UPDATES, (LocationListener) this);
+
+                    if (locationManager != null) {
+                        loc = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                        if (loc != null)
+                            updateUI(loc);
+                    }
+                } else if (isNetwork) {
+                    // from Network Provider
+                    Log.d(TAG, "NETWORK_PROVIDER on");
+                    locationManager.requestLocationUpdates(
+                            LocationManager.NETWORK_PROVIDER,
+                            MIN_TIME_BW_UPDATES,
+                            MIN_DISTANCE_CHANGE_FOR_UPDATES, (LocationListener) this);
+
+                    if (locationManager != null) {
+                        loc = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+                        if (loc != null)
+                            updateUI(loc);
+                    }
+                } else {
+                    loc.setLatitude(0);
+                    loc.setLongitude(0);
+                    updateUI(loc);
+                }
+            } else {
+                Log.d(TAG, "Can't get location");
+            }
+        } catch (SecurityException e) {
+            e.printStackTrace();
+        }
     }
 
-    private void CheckPermission(String PermissionToCheck) {
-        if (android.os.Build.VERSION.SDK_INT >= 23)
-        {
-            boolean ResultCheck = false;
-            try
-            {
-                java.lang.reflect.Method methodCheckPermission = Activity.class.getMethod("checkSelfPermission", java.lang.String.class);
-                Object resultObj = methodCheckPermission.invoke(this, PermissionToCheck);
-                int result = Integer.parseInt(resultObj.toString());
-                ResultCheck = result == PackageManager.PERMISSION_GRANTED;
-            } catch (Exception e){}
-            if (!ResultCheck) {
-                try {
-                    java.lang.reflect.Method methodRequestPermission = Activity.class.getMethod("requestPermissions", java.lang.String[].class, int.class);
-                    methodRequestPermission.invoke(this, new String[] {PermissionToCheck}, 0x12345);
-                } catch (Exception e) {}
+    private void getLastLocation() {
+        try {
+            Criteria criteria = new Criteria();
+            String provider = locationManager.getBestProvider(criteria, false);
+            Location location = locationManager.getLastKnownLocation(provider);
+            Log.d(TAG, provider);
+            Log.d(TAG, location == null ? "NO LastLocation" : location.toString());
+        } catch (SecurityException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private ArrayList findUnAskedPermissions(ArrayList<String> wanted) {
+        ArrayList result = new ArrayList();
+
+        for (String perm : wanted) {
+            if (!hasPermission(perm)) {
+                result.add(perm);
             }
         }
+
+        return result;
     }
 
-    /*public String getDeviceIMEI() {
-        String deviceUniqueIdentifier = null;
-        TelephonyManager tm = (TelephonyManager) this.getSystemService(Context.TELEPHONY_SERVICE);
-        if (null != tm) {
-            if (checkSelfPermission(Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
-                return "";
+    private boolean hasPermission(String permission) {
+        if (canAskPermission()) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                return (checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED);
             }
-            deviceUniqueIdentifier = tm.getDeviceId();
         }
-        if (null == deviceUniqueIdentifier || 0 == deviceUniqueIdentifier.length()) {
-            deviceUniqueIdentifier = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
-        }
-        return deviceUniqueIdentifier;
-    }*/
+        return true;
+    }
 
-    public class MyLocationListener implements LocationListener {
+    private boolean canAskPermission() {
+        return (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1);
+    }
 
-        public MyLocationListener() {
-            super();
-        }
+    @TargetApi(Build.VERSION_CODES.M)
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        switch (requestCode) {
+            case ALL_PERMISSIONS_RESULT:
+                Log.d(TAG, "onRequestPermissionsResult");
+                for (String perms : permissionsToRequest) {
+                    if (!hasPermission(perms)) {
+                        permissionsRejected.add(perms);
+                    }
+                }
 
-        @Override
-        public void onProviderDisabled(String arg0) {
-            // TODO Auto-generated method stub
-
-        }
-
-        @Override
-        public void onProviderEnabled(String arg0) {
-            // TODO Auto-generated method stub
-
-        }
-
-        @Override
-        public void onLocationChanged(Location location) {
-            Latitude = location.getLatitude();
-            Longitude = location.getLongitude();
-            textView.setText(String.format("%s GPS (%.5f, %.5f)", Latitude, Longitude));
-        }
-
-        @Override
-        public void onStatusChanged(String arg0, int arg1, Bundle arg2) {
-            // TODO Auto-generated method stub
-
+                if (permissionsRejected.size() > 0) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        if (shouldShowRequestPermissionRationale(permissionsRejected.get(0))) {
+                            showMessageOKCancel("These permissions are mandatory for the application. Please allow access.",
+                                    new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                                                requestPermissions(permissionsRejected.toArray(
+                                                        new String[permissionsRejected.size()]), ALL_PERMISSIONS_RESULT);
+                                            }
+                                        }
+                                    });
+                            return;
+                        }
+                    }
+                } else {
+                    Log.d(TAG, "No rejected permissions.");
+                    canGetLocation = true;
+                    getLocation();
+                }
+                break;
         }
     }
 
-    public void localizar(){}
+    public void showSettingsAlert() {
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
+        alertDialog.setTitle("GPS is not Enabled!");
+        alertDialog.setMessage("Do you want to turn on GPS?");
+        alertDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                startActivity(intent);
+            }
+        });
 
+        alertDialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        alertDialog.show();
+    }
+
+    private void showMessageOKCancel(String message, DialogInterface.OnClickListener okListener) {
+        new AlertDialog.Builder(Emergencia.this)
+                .setMessage(message)
+                .setPositiveButton("OK", okListener)
+                .setNegativeButton("Cancel", null)
+                .create()
+                .show();
+    }
+
+    private void updateUI(Location loc) {
+        Log.d(TAG, "updateUI");
+        textView.setText(Double.toString(loc.getLatitude())+Double.toString(loc.getLongitude()));
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (locationManager != null) {
+            locationManager.removeUpdates((LocationListener) this);
+        }
+    }
+    
 }

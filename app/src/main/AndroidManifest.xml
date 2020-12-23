@@ -38,6 +38,8 @@
         <activity android:name=".Emergencia" />
         <activity android:name=".Padecimientos" />
         <activity android:name=".DatosPersonales" />
+        <activity android:name=".AtencionEmergencia"/>
+        <activity android:name=".Menu"/>
         <activity android:name=".Activity2"/>
     </application>
 

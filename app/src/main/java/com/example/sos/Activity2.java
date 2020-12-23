@@ -38,10 +38,7 @@ import com.google.android.gms.common.api.GoogleApi;
 import com.google.android.gms.tasks.Task;
 
 public class Activity2 extends AppCompatActivity {
-
-    int RC_SIGN_IN = 0;
-    GoogleSignInClient mGoogleSignInClient;
-
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,7 +57,7 @@ public class Activity2 extends AppCompatActivity {
         startActivity(emergencias);
     }
     public void Menu(View view){
-        Intent Menu = new Intent(this, Menu.class);
-        startActivity(Menu);
+        Intent menu = new Intent(this, Menu.class);
+        startActivity(menu);
     }
 }
