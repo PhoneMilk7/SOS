@@ -38,10 +38,14 @@ import java.net.URLEncoder;
 import android.provider.Settings;
 import android.provider.Settings.System;
 
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+
 public class DatosPersonales extends AppCompatActivity {
     private EditText etnombre, etapellidoPaterno, etapellidoMaterno, etedad, etelefono;
     private RadioButton rdb_hombre, rdb_mujer;
-    static String token = "CositasSOS", sesion = "0", imei = "", nombre, apellidoPaterno, apellidoMaterno, edad, telefono, genero, IMEICode;
+    static String token = "CositasSOS", sesion = "0", id = "", nombre, apellidoPaterno, apellidoMaterno, edad, telefono, genero, personId;
     static double Latitude, Longitude;
 
     @Override
@@ -64,11 +68,22 @@ public class DatosPersonales extends AppCompatActivity {
         rdb_hombre = findViewById(R.id.rdb_hombre);
         rdb_mujer = findViewById(R.id.rdb_mujer);
         etelefono = findViewById(R.id.txt_telefono);
+
+        // Configure el inicio de sesión para solicitar el ID del usuario, la dirección de correo electrónico y el perfil básico.
+        // La identificación y el perfil básico están incluidos en DEFAULT_SIGN_IN
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .build();
+
+        GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(DatosPersonales.this);
+        if (acct != null) {
+            personId = acct.getId();
+        }
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     public void Enviar(View view) {
-        imei = IMEICode;
+        id = personId;
         nombre = etnombre.getText().toString();
         apellidoPaterno = etapellidoPaterno.getText().toString();
         apellidoMaterno = etapellidoMaterno.getText().toString();
@@ -85,7 +100,7 @@ public class DatosPersonales extends AppCompatActivity {
             Toast.makeText(this, "Debes ingresar todos los campos para continuar", Toast.LENGTH_SHORT).show();
         } else {
             //Toast.makeText(this,"Datos guardados, gracias", Toast.LENGTH_SHORT).show();
-            new guardarDB(DatosPersonales.this).execute(token, sesion, imei, nombre, apellidoPaterno, apellidoMaterno, edad, genero, telefono);
+            new guardarDB(DatosPersonales.this).execute(token, sesion, id, nombre, apellidoPaterno, apellidoMaterno, edad, genero, telefono);
             finish();
         }
     }
@@ -115,7 +130,7 @@ public class DatosPersonales extends AppCompatActivity {
 
                 token = params[0];
                 sesion = params[1];
-                imei = params[2];
+                id = params[2];
                 nombre = params[3];
                 apellidoPaterno = params[4];
                 apellidoMaterno = params[5];
@@ -125,7 +140,7 @@ public class DatosPersonales extends AppCompatActivity {
 
                 String data = URLEncoder.encode("token", "UTF_8") + "=" + URLEncoder.encode(token, "UTF_8") + "&" +
                         URLEncoder.encode("sesion", "UTF_8") + "=" + URLEncoder.encode(sesion, "UTF_8") + "&" +
-                        URLEncoder.encode("imei", "UTF_8") + "=" + URLEncoder.encode(imei, "UTF_8") + "&" +
+                        URLEncoder.encode("imei", "UTF_8") + "=" + URLEncoder.encode(id, "UTF_8") + "&" +
                         URLEncoder.encode("nombre", "UTF_8") + "=" + URLEncoder.encode(nombre, "UTF_8") + "&" +
                         URLEncoder.encode("apellidoPaterno", "UTF_8") + "=" + URLEncoder.encode(apellidoPaterno, "UTF_8") + "&" +
                         URLEncoder.encode("apellidoMaterno", "UTF_8") + "=" + URLEncoder.encode(apellidoMaterno, "UTF_8") + "&" +

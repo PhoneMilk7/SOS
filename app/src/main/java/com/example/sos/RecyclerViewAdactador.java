@@ -21,8 +21,6 @@ public class RecyclerViewAdactador extends RecyclerView.Adapter<RecyclerViewAdac
         }
     }
 
-
-
     public List<EmergenciasModelo> emergenciaLista;
 
     public RecyclerViewAdactador(List<EmergenciasModelo> emergenciaLista) {

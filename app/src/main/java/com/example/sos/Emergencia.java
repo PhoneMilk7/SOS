@@ -19,6 +19,7 @@ import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -29,6 +30,12 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.bumptech.glide.Glide;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -44,16 +51,16 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Locale;
 
 public class Emergencia extends AppCompatActivity implements LocationListener {
     private static final int REQUEST_LOCATION = 1;
-    static String token = "CositasSOS", sesion = "1", imei , estado, longitud, latitud, tipo,IMEICode="2147483647";
-    static double Latitude, Longitude;
+    static String token = "CositasSOS", sesion = "1", id , estado, longitud, latitud, tipo, personId;
+    static Double La, Lo;
     TextView textView;
     Button btnpropia;
     Button btntercero;
     Button btnGetLocation;
-    String latitude, longitude;
 
     //Parte de permisos de ubicacion
     final String TAG = "GPS";
@@ -61,7 +68,6 @@ public class Emergencia extends AppCompatActivity implements LocationListener {
     private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 10;
     private static final long MIN_TIME_BW_UPDATES = 1000 * 60 * 1;
 
-    TextView tvLatitude, tvLongitude;
     LocationManager locationManager;
     Location loc;
     ArrayList<String> permissions = new ArrayList<>();
@@ -109,24 +115,37 @@ public class Emergencia extends AppCompatActivity implements LocationListener {
             // get location
             getLocation();
         }
+        ////Pedir la localizacion termina
 
+        // Configure el inicio de sesión para solicitar el ID del usuario, la dirección de correo electrónico y el perfil básico.
+        // La identificación y el perfil básico están incluidos en DEFAULT_SIGN_IN
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .build();
+
+        GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(Emergencia.this);
+        if (acct != null) {
+            personId = acct.getId();
+            Toast.makeText(this,personId, Toast.LENGTH_SHORT).show();
+        }
     }
 
     public void propia(View view){
-        imei = IMEICode;          //El identificador unico del telefono
+        id = personId;          //El identificador
         estado = "1";           //El evento esta en estado activo
-        latitud = Double.toString(Latitude);      //La latitud de la ubicacion del evento
-        longitud = Double.toString(Longitude);     //La longitud de la ubicacion del evento
         tipo = "1";               //El evento es de tipo Emergencia propia
-        new Emergencia.guardarDB(Emergencia.this).execute(token, sesion,imei,estado,longitud,latitud,tipo);
+        new Emergencia.guardarDB(Emergencia.this).execute(token,sesion,id,estado,longitud,latitud,tipo);
     }
     public void terceros(View view){
-        imei = IMEICode;          //El identificador unico del telefono
+        id = personId;          //El identificador
         estado = "1";           //El evento esta en estado activo
-        latitud = Double.toString(Latitude);      //La latitud de la ubicacion del evento
-        longitud = Double.toString(Longitude);     //La longitud de la ubicacion del evento
         tipo = "2";               //El evento es de tipo Emergencia propia
-        new Emergencia.guardarDB(Emergencia.this).execute(token, sesion,imei,estado,longitud,latitud,tipo);
+        new Emergencia.guardarDB(Emergencia.this).execute(token,sesion,id,estado,longitud,latitud,tipo);
+    }
+    public void mapa(View view){
+        String uri = String.format(Locale.ENGLISH, "http://maps.google.com/maps?q=loc:%f,%f", La,Lo);
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
+        startActivity(intent);
     }
 
     //Manda a guardar los datos de la emegencia
@@ -155,7 +174,7 @@ public class Emergencia extends AppCompatActivity implements LocationListener {
 
                 token = params[0];
                 sesion = params[1];
-                imei = params[2];
+                id = params[2];
                 estado = params[3];
                 longitud = params[4];
                 latitud = params[5];
@@ -164,7 +183,7 @@ public class Emergencia extends AppCompatActivity implements LocationListener {
                 //Crea la variable data con todos los datos en formato URLEncode
                 String data = URLEncoder.encode("token", "UTF_8") + "=" + URLEncoder.encode(token, "UTF_8") + "&" +
                         URLEncoder.encode("sesion", "UTF_8") + "=" + URLEncoder.encode(sesion, "UTF_8") + "&" +
-                        URLEncoder.encode("imei", "UTF_8") + "=" + URLEncoder.encode(imei, "UTF_8") + "&" +
+                        URLEncoder.encode("imei", "UTF_8") + "=" + URLEncoder.encode(id, "UTF_8") + "&" +
                         URLEncoder.encode("estado", "UTF_8") + "=" + URLEncoder.encode(estado, "UTF_8") + "&" +
                         URLEncoder.encode("longitud", "UTF_8") + "=" + URLEncoder.encode(longitud, "UTF_8") + "&" +
                         URLEncoder.encode("latitud", "UTF_8") + "=" + URLEncoder.encode(latitud, "UTF_8")+ "&" +
@@ -369,7 +388,11 @@ public class Emergencia extends AppCompatActivity implements LocationListener {
 
     private void updateUI(Location loc) {
         Log.d(TAG, "updateUI");
-        textView.setText(Double.toString(loc.getLatitude())+Double.toString(loc.getLongitude()));
+        textView.setText(Double.toString(loc.getLatitude())+"  "+Double.toString(loc.getLongitude()));
+        longitud = Double.toString(loc.getLatitude());
+        latitud = Double.toString(loc.getLongitude());
+        Lo= loc.getLongitude();
+        La= loc.getLatitude();
     }
 
     @Override
