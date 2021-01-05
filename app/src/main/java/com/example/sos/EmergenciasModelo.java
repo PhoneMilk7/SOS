@@ -1,14 +1,25 @@
 package com.example.sos;
 
 public class EmergenciasModelo {
-    String nombre,descripcion;
 
-    public EmergenciasModelo() {
+    String id;
+    String idUsuario;
+    String nombre;
+    String apellido;
+    public String getId() {
+        return id;
     }
 
-    public EmergenciasModelo(String nombre, String descripcion) {
-        this.nombre = nombre;
-        this.descripcion = descripcion;
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getIdUsuario() {
+        return idUsuario;
+    }
+
+    public void setIdUsuario(String idUsuario) {
+        this.idUsuario = idUsuario;
     }
 
     public String getNombre() {
@@ -19,11 +30,22 @@ public class EmergenciasModelo {
         this.nombre = nombre;
     }
 
-    public String getDescripcion() {
-        return descripcion;
+    public String getApellido() {
+        return apellido;
     }
 
-    public void setDescripcion(String descripcion) {
-        this.descripcion = descripcion;
+    public void setApellido(String apellido) {
+        this.apellido = apellido;
     }
+
+    public EmergenciasModelo(String id, String idUsuario, String nombre, String apellido) {
+        this.id = id;
+        this.idUsuario = idUsuario;
+        this.nombre = nombre;
+        this.apellido = apellido;
+    }
+
+
+
+
 }

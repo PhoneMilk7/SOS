@@ -8,9 +8,11 @@
     <string name="rdb_hombre">Hombre</string>
     <string name="txt_telefono">Teléfono</string>
     <string name="Titulo_personales">Datos personales</string>
+    <string name="boton_atencion">Atención de emergencia</string>
 
-    <string name="text_inicio">Google Sign On</string>
-    <string name="boton_inicio">Google Sign On</string>
+    <string name="text_inicio">Google Inicio de sesión</string>
+    <string name="boton_atras">Atrás</string>
+    <string name="boton_inicio">Inicio de sesión</string>
     <string name="title_activity_maps">Map</string>
     <string name="boton_mapa">Mapa Google</string>
     <string name="title_activity_opcionea">opciones</string>

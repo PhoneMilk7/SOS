@@ -44,6 +44,7 @@
         android:layout_marginBottom="8dp"
         android:onClick="Padecimientos"
         android:text="Padecimientos"
+        android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/buttonPersonales"
         app:layout_constraintStart_toStartOf="@+id/buttonPersonales" />
@@ -56,5 +57,15 @@
         android:text="Menu"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:text="Seleccionar para reportar emergencia."
+        app:layout_constraintEnd_toEndOf="@+id/imageView"
+        app:layout_constraintStart_toStartOf="@+id/imageView"
+        app:layout_constraintTop_toBottomOf="@+id/imageView" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

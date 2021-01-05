@@ -2,8 +2,10 @@ package com.example.sos;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -11,6 +13,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.common.api.ApiException;
@@ -38,7 +41,6 @@ import com.google.android.gms.common.api.GoogleApi;
 import com.google.android.gms.tasks.Task;
 
 public class Activity2 extends AppCompatActivity {
-    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,8 +51,8 @@ public class Activity2 extends AppCompatActivity {
         startActivity(datosP);
     }
     public void Padecimientos(View view){
-        Intent Padeci= new Intent(this, Padecimientos.class);
-        startActivity(Padeci);
+        //Intent Padeci= new Intent(this, Padecimientos.class);
+        //startActivity(Padeci);
     }
     public void Emergencias(View view){
         Intent emergencias = new Intent(this, Emergencia.class);

@@ -78,6 +78,15 @@ public class DatosPersonales extends AppCompatActivity {
         GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(DatosPersonales.this);
         if (acct != null) {
             personId = acct.getId();
+            etnombre.setText(acct.getGivenName());
+            String n = acct.getFamilyName();
+            if (n!=null){
+                String[] apellido =acct.getFamilyName().split(" ");
+                etapellidoPaterno.setText(apellido[0]);
+                if(apellido.length == 2){
+                    etapellidoMaterno.setText(apellido[1]);
+                }
+            }
         }
     }
 
@@ -105,6 +114,10 @@ public class DatosPersonales extends AppCompatActivity {
         }
     }
 
+    public void Atras(View view){
+        //Inicializa el activity Activity2
+        finish();
+    }
 
     public static class guardarDB extends AsyncTask<String, Void, String> {
 
@@ -182,8 +195,7 @@ public class DatosPersonales extends AppCompatActivity {
         }
     }
 
-    private void CheckAllPermission()
-    {
+    private void CheckAllPermission() {
         try {
             String[] permissions = getPackageManager().getPackageInfo(getBaseContext().getPackageName(),
                     PackageManager.GET_PERMISSIONS).requestedPermissions;
@@ -192,8 +204,7 @@ public class DatosPersonales extends AppCompatActivity {
         } catch (PackageManager.NameNotFoundException e) {}
     }
 
-    private void CheckPermission(String PermissionToCheck)
-    {
+    private void CheckPermission(String PermissionToCheck){
         if (android.os.Build.VERSION.SDK_INT >= 23)
         {
             boolean ResultCheck = false;
@@ -212,21 +223,6 @@ public class DatosPersonales extends AppCompatActivity {
             }
         }
     }
-
-    //public String getDeviceIMEI() {
-    //    String deviceUniqueIdentifier = null;
-    //    TelephonyManager tm = (TelephonyManager) this.getSystemService(Context.TELEPHONY_SERVICE);
-    //    if (null != tm) {
-    //       if (checkSelfPermission(Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
-    //            return "";
-    //       }
-    //        deviceUniqueIdentifier = tm.getDeviceId();
-    //    }
-    //    if (null == deviceUniqueIdentifier || 0 == deviceUniqueIdentifier.length()) {
-    //        deviceUniqueIdentifier = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
-    //    }
-    //    return deviceUniqueIdentifier;
-    //}
 
     public class MyLocationListener implements LocationListener {
 

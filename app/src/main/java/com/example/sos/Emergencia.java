@@ -55,7 +55,8 @@ import java.util.Locale;
 
 public class Emergencia extends AppCompatActivity implements LocationListener {
     private static final int REQUEST_LOCATION = 1;
-    static String token = "CositasSOS", sesion = "1", id , estado, longitud, latitud, tipo, personId;
+    GoogleSignInClient mGoogleSignInClient;
+    static String token = "CositasSOS", sesion = "1", id , estado, longitud, latitud, tipo, personId, personNombre, apellidoPaterno = " ";
     static Double La, Lo;
     TextView textView;
     Button btnpropia;
@@ -122,11 +123,17 @@ public class Emergencia extends AppCompatActivity implements LocationListener {
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
                 .build();
+        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
 
         GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(Emergencia.this);
         if (acct != null) {
+            personNombre = acct.getGivenName();
+            String n = acct.getFamilyName();
+            if (n!=null){
+                String[] apellido =acct.getFamilyName().split(" ");
+                apellidoPaterno = apellido[0];
+            }
             personId = acct.getId();
-            Toast.makeText(this,personId, Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -134,18 +141,15 @@ public class Emergencia extends AppCompatActivity implements LocationListener {
         id = personId;          //El identificador
         estado = "1";           //El evento esta en estado activo
         tipo = "1";               //El evento es de tipo Emergencia propia
-        new Emergencia.guardarDB(Emergencia.this).execute(token,sesion,id,estado,longitud,latitud,tipo);
+        new Emergencia.guardarDB(Emergencia.this).execute(token,sesion,id,estado,longitud,latitud,tipo, personNombre, apellidoPaterno);
+        finish();
     }
     public void terceros(View view){
         id = personId;          //El identificador
         estado = "1";           //El evento esta en estado activo
         tipo = "2";               //El evento es de tipo Emergencia propia
-        new Emergencia.guardarDB(Emergencia.this).execute(token,sesion,id,estado,longitud,latitud,tipo);
-    }
-    public void mapa(View view){
-        String uri = String.format(Locale.ENGLISH, "http://maps.google.com/maps?q=loc:%f,%f", La,Lo);
-        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
-        startActivity(intent);
+        new Emergencia.guardarDB(Emergencia.this).execute(token,sesion,id,estado,longitud,latitud,tipo, personNombre, apellidoPaterno);
+        finish();
     }
 
     //Manda a guardar los datos de la emegencia
@@ -179,15 +183,19 @@ public class Emergencia extends AppCompatActivity implements LocationListener {
                 longitud = params[4];
                 latitud = params[5];
                 tipo = params[6];
+                personNombre = params[7];
+                apellidoPaterno = params[8];
 
                 //Crea la variable data con todos los datos en formato URLEncode
                 String data = URLEncoder.encode("token", "UTF_8") + "=" + URLEncoder.encode(token, "UTF_8") + "&" +
                         URLEncoder.encode("sesion", "UTF_8") + "=" + URLEncoder.encode(sesion, "UTF_8") + "&" +
-                        URLEncoder.encode("imei", "UTF_8") + "=" + URLEncoder.encode(id, "UTF_8") + "&" +
+                        URLEncoder.encode("id", "UTF_8") + "=" + URLEncoder.encode(id, "UTF_8") + "&" +
                         URLEncoder.encode("estado", "UTF_8") + "=" + URLEncoder.encode(estado, "UTF_8") + "&" +
                         URLEncoder.encode("longitud", "UTF_8") + "=" + URLEncoder.encode(longitud, "UTF_8") + "&" +
                         URLEncoder.encode("latitud", "UTF_8") + "=" + URLEncoder.encode(latitud, "UTF_8")+ "&" +
-                        URLEncoder.encode("tipo", "UTF_8") + "=" + URLEncoder.encode(tipo, "UTF_8");
+                        URLEncoder.encode("tipo", "UTF_8") + "=" + URLEncoder.encode(tipo, "UTF_8") + "&" +
+                        URLEncoder.encode("personNombre", "UTF_8") + "=" + URLEncoder.encode(personNombre, "UTF_8") + "&" +
+                        URLEncoder.encode("apellidoPaterno", "UTF_8") + "=" + URLEncoder.encode(apellidoPaterno, "UTF_8");
 
                 bufferedWriter.write(data);
                 bufferedWriter.flush();
@@ -388,7 +396,6 @@ public class Emergencia extends AppCompatActivity implements LocationListener {
 
     private void updateUI(Location loc) {
         Log.d(TAG, "updateUI");
-        textView.setText(Double.toString(loc.getLatitude())+"  "+Double.toString(loc.getLongitude()));
         longitud = Double.toString(loc.getLatitude());
         latitud = Double.toString(loc.getLongitude());
         Lo= loc.getLongitude();
@@ -402,5 +409,7 @@ public class Emergencia extends AppCompatActivity implements LocationListener {
             locationManager.removeUpdates((LocationListener) this);
         }
     }
-    
+    public void Atras(View view){
+        finish();
+    }
 }
