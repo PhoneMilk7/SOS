@@ -81,7 +81,7 @@ public class AtencionEmergencia extends AppCompatActivity {
             apellido[y] = parts[i]; i++;
             y++;
         }while(y < n);
-
+        //test video
         List<EmergenciasModelo> emergencia = new ArrayList<>();
         //llamada a la base de datos para llenar el array
         for (int j = 0; j < y; j++ ){
