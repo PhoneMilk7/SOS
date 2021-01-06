@@ -1,5 +1,5 @@
 package com.example.sos;
-
+//Autores: Pereda Hernandez Leonel y Verdin Garcia José Antonio
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;

@@ -1,5 +1,5 @@
 package com.example.sos;
-
+//Autores: Pereda Hernandez Leonel y Verdin Garcia José Antonio
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;

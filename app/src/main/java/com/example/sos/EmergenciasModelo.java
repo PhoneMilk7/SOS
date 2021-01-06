@@ -1,5 +1,5 @@
 package com.example.sos;
-
+//Autores: Pereda Hernandez Leonel y Verdin Garcia José Antonio
 public class EmergenciasModelo {
 
     String id;
